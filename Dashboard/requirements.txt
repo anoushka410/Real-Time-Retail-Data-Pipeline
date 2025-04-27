@@ -1,5 +1,5 @@
-matplotlib==3.7.2
-pandas==1.5.3
-psycopg2==2.9.10
-seaborn==0.12.2
-streamlit==1.30.0
+matplotlib
+pandas
+psycopg2
+seaborn
+streamlit
