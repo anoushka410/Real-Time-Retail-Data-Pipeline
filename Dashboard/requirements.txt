@@ -1,5 +1,6 @@
 matplotlib
 pandas
+psycopg2-binary
 psycopg2
 seaborn
 streamlit
