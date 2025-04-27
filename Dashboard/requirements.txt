@@ -1,5 +1,5 @@
 matplotlib
 pandas
 psycopg2-binary
-seaborn
+seaborn==0.12.2
 streamlit
