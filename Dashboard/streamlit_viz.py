@@ -109,7 +109,6 @@ def fetch_data(time_duration):
             if response.data:
                 df = pd.DataFrame(response.data)
                 st.write(f"Displaying data for the last: {time_duration}")
-                st.dataframe(df)
                 return df
             else:
                 return pd.DataFrame()
@@ -252,7 +251,7 @@ if __name__ == "__main__":
         # Fetch latest data with time filter
         df = fetch_data(selected_duration)
         # Convert InvoiceDate to datetime format
-        df["invoicedate"] = pd.to_datetime(df["invoicedate"], format="%Y-%m-%d %H:%M:%S", errors='coerce')
+        df["invoicedate"] = pd.to_datetime(df["invoicedate"], errors='coerce')
         st.dataframe(df)
         
         if not df.empty:
