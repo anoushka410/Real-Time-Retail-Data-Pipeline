@@ -169,8 +169,9 @@ def create_revenue_trend_chart(df):
         plt.tight_layout()
         
         chart_placeholder = st.empty()
-        with chart_placeholder.container():
-            st.pyplot(fig)
+        with chart_placeholder.container():\
+            st.dataframe(hourly_revenue)
+            # st.pyplot(fig)
 
         plt.close(fig)
 
