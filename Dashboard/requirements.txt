@@ -3,3 +3,4 @@ pandas
 psycopg2-binary
 seaborn==0.12.2
 streamlit
+sqlalchemy
