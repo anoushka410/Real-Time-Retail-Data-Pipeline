@@ -156,6 +156,7 @@ def create_top_products_chart(df):
 
 # Function to create revenue trend chart
 def create_revenue_trend_chart(df):
+    st.dataframe(df)
     if not df.empty:
         df['hour'] = df['invoicedate'].dt.hour
         hourly_revenue = df.groupby('hour')['totalamount'].sum()
@@ -170,7 +171,7 @@ def create_revenue_trend_chart(df):
         
         chart_placeholder = st.empty()
         with chart_placeholder.container():\
-            st.dataframe(hourly_revenue)
+            st.dataframe(df)
             # st.pyplot(fig)
 
         plt.close(fig)
