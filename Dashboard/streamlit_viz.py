@@ -15,7 +15,12 @@ CHART_SIZE = (12, 8)
 def get_db_connection_streamlit():
     try:
         # Initialize connection.
-        connection = st.connection("postgresql", type="sql")
+        # connection = st.connection("postgresql", type="sql")
+        
+        # Fetch the database credentials from Streamlit's secrets manager
+        conn_string = st.secrets["connections"]["postgresql"]
+        # Establish the connection
+        connection = psycopg2.connect(conn_string)
         print("PostgreSQL connection established!")
         return connection
     except Exception as e:
