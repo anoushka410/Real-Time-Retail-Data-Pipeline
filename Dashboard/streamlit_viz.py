@@ -3,8 +3,17 @@ import pandas as pd
 import psycopg2
 from datetime import datetime, timedelta
 import time
+import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+from dotenv import load_dotenv
+from supabase import create_client
+
+load_dotenv()
+
+# Fetch Environment variables
+URL=os.getenv("supabase_url")
+KEY=os.getenv("supabase_key")
 
 # Set the style for matplotlib
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -12,42 +21,37 @@ plt.style.use('seaborn-v0_8-whitegrid')
 # Set a consistent figure size for all charts
 CHART_SIZE = (12, 8)
 
-def get_db_connection_streamlit():
+def get_connection_hosted_db():
     try:
         # Initialize connection.
-        # connection = st.connection("postgresql", type="sql")
-        
-        # Fetch the database credentials from Streamlit's secrets manager
-        conn_string = st.secrets["connections"]["postgresql"]
-        # Establish the connection
-        connection = psycopg2.connect(conn_string)
-        print("PostgreSQL connection established!")
-        return connection
+        supabase_client = create_client(URL, KEY)
+        print("PostgreSQL connection to the hosted db established!")
+        return supabase_client
     except Exception as e:
         st.error(f"Error connecting to database: {e}")
         return None
 
-# Database connection function
-def get_db_connection():
-    try:
-        connection = psycopg2.connect(
-            database="real_time_db",
-            user="postgres",
-            password="postgresql",
-            host="localhost",
-            port="5432"
-        )
-        print("PostgreSQL connection established!")
-        return connection
-    except Exception as e:
-        st.error(f"Error connecting to database: {e}")
-        return None
+# # Database connection function
+# def get_db_connection():
+#     try:
+#         connection = psycopg2.connect(
+#             database=DATABASE,
+#             user=USER,
+#             password=PASSWORD,
+#             host=HOST,
+#             port=PORT
+#         )
+#         print("PostgreSQL connection established!")
+#         return connection
+#     except Exception as e:
+#         st.error(f"Error connecting to database: {e}")
+#         return None
 
 # Function to fetch data from database
 def fetch_data(time_duration):
     # connection = get_db_connection()
-    connection = get_db_connection_streamlit()
-    if connection:
+    supabase_client = get_connection_hosted_db()
+    if supabase_client:
         try:
             # Calculate the time filter based on selected duration
             # now = datetime.strptime("2010-12-01 12:00 PM", "%Y-%m-%d %I:%M %p")
@@ -71,31 +75,57 @@ def fetch_data(time_duration):
                 time_filter = now - timedelta(hours=24)  # Default to 24 hours
 
             print(time_filter)
-            if time_filter == None:
-                query = f"""
-                    SELECT 
-                        description, quantity, invoicedate, country, totalamount
-                    FROM online_retail 
-                    """
-            else:
-                query = f"""
-                    SELECT 
-                        description, quantity, invoicedate, country, totalamount
-                    FROM online_retail 
-                    WHERE 
-                        invoicedate >= '{time_filter}' and invoicedate <= '{now}'
-                    """
+            # if time_filter == None:
+            #     query = f"""
+            #         SELECT 
+            #             description, quantity, invoicedate, country, totalamount
+            #         FROM online_retail 
+            #         """
+            # else:
+            #     query = f"""
+            #         SELECT 
+            #             description, quantity, invoicedate, country, totalamount
+            #         FROM online_retail 
+            #         WHERE 
+            #             invoicedate >= '{time_filter}' and invoicedate <= '{now}'
+            #         """
             # df = pd.read_sql(query, connection)
-            df = connection.query(query, ttl="0")
-            st.write(f"Displaying data for the last: {time_duration}")
-            return df
+
+            # Build the query
+            if time_filter is None:
+                response = (
+                    supabase_client
+                    .table("online_retail")
+                    .select("description, quantity, invoicedate, country, totalamount")
+                    .execute()
+                )
+            else:
+                response = (
+                    supabase_client
+                    .table("online_retail")
+                    .select("description, quantity, invoicedate, country, totalamount")
+                    .gte('invoicedate', time_filter.isoformat())
+                    .lte('invoicedate', now.isoformat())
+                    .execute()
+                )
+            
+            if response.data:
+                df = pd.DataFrame(response.data)
+                # Convert InvoiceDate to datetime format
+                df["invoicedate"] = pd.to_datetime(df["invoicedate"], format="%Y-%m-%d %H:%M:%S", errors='coerce')
+                st.write(f"Displaying data for the last: {time_duration}")
+                return df
+            else:
+                st.warning("No data returned.")
+                return pd.DataFrame()
+            
         except Exception as e:
             st.error(f"Error fetching data: {e}")
             return pd.DataFrame()
-        finally:
-            pass
-            # connection.close()
-    return pd.DataFrame()
+        
+        # connection.close()
+    else:
+        return pd.DataFrame()
 
 # Function to create metrics
 def create_metrics(df):
@@ -212,7 +242,7 @@ if __name__ == "__main__":
     # Add refresh button and timestamp at the top
     if st.button("Refresh Now", key="refresh_button"):
         st.session_state.last_update = datetime.now()
-        st.experimental_rerun()
+        st.rerun()
     
     st.write(f"Last updated: {st.session_state.last_update.strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -248,4 +278,4 @@ if __name__ == "__main__":
     # Auto-refresh logic
     time.sleep(refresh_interval)
     st.session_state.last_update = datetime.now()
-    st.experimental_rerun()
+    st.rerun()
