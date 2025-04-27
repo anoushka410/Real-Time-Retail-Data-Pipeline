@@ -252,7 +252,6 @@ if __name__ == "__main__":
         df = fetch_data(selected_duration)
         # Convert InvoiceDate to datetime format
         df["invoicedate"] = pd.to_datetime(df["invoicedate"], errors='coerce')
-        st.dataframe(df)
         
         if not df.empty:
             # Create metrics
