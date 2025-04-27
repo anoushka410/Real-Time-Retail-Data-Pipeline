@@ -2,5 +2,5 @@ matplotlib
 pandas
 psycopg2-binary
 seaborn==0.12.2
-streamlit
+streamlit==1.30.0
 sqlalchemy
