@@ -7,10 +7,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Set the style for matplotlib
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8-whitegrid')
 
 # Set a consistent figure size for all charts
 CHART_SIZE = (12, 8)
+
+def get_db_connection_streamlit():
+    try:
+        # Initialize connection.
+        connection = st.connection("postgresql", type="sql")
+        print("PostgreSQL connection established!")
+        return connection
+    except Exception as e:
+        st.error(f"Error connecting to database: {e}")
+        return None
 
 # Database connection function
 def get_db_connection():
@@ -22,6 +32,7 @@ def get_db_connection():
             host="localhost",
             port="5432"
         )
+        print("PostgreSQL connection established!")
         return connection
     except Exception as e:
         st.error(f"Error connecting to database: {e}")
@@ -29,8 +40,8 @@ def get_db_connection():
 
 # Function to fetch data from database
 def fetch_data(time_duration):
-    connection = get_db_connection()
-    # st.write(f"Fetching data for the last: {selected_duration}")
+    # connection = get_db_connection()
+    connection = get_db_connection_streamlit()
     if connection:
         try:
             # Calculate the time filter based on selected duration
@@ -69,14 +80,16 @@ def fetch_data(time_duration):
                     WHERE 
                         invoicedate >= '{time_filter}' and invoicedate <= '{now}'
                     """
-            df = pd.read_sql(query, connection)
+            # df = pd.read_sql(query, connection)
+            df = connection.query(query, ttl="0")
             st.write(f"Displaying data for the last: {time_duration}")
             return df
         except Exception as e:
             st.error(f"Error fetching data: {e}")
             return pd.DataFrame()
         finally:
-            connection.close()
+            pass
+            # connection.close()
     return pd.DataFrame()
 
 # Function to create metrics
