@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Set the style for matplotlib
-plt.style.use('seaborn')
+plt.style.use('seaborn-v0_8-whitegrid')
 
 # Set a consistent figure size for all charts
 CHART_SIZE = (12, 8)
