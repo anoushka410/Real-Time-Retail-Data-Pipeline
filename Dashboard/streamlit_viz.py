@@ -108,12 +108,9 @@ def fetch_data(time_duration):
             
             if response.data:
                 df = pd.DataFrame(response.data)
-                # Convert InvoiceDate to datetime format
-                df["invoicedate"] = pd.to_datetime(df["invoicedate"], format="%Y-%m-%d %H:%M:%S", errors='coerce')
                 st.write(f"Displaying data for the last: {time_duration}")
                 return df
             else:
-                st.warning("No data returned.")
                 return pd.DataFrame()
             
         except Exception as e:
@@ -247,12 +244,14 @@ if __name__ == "__main__":
     dashboard_placeholder = st.empty()
     
     # Auto-refresh every 30 seconds
-    refresh_interval = 600
+    refresh_interval = 30
     
     # Main dashboard content
     with dashboard_placeholder.container():
         # Fetch latest data with time filter
         df = fetch_data(selected_duration)
+        # Convert InvoiceDate to datetime format
+        df["invoicedate"] = pd.to_datetime(df["invoicedate"], format="%Y-%m-%d %H:%M:%S", errors='coerce')
         
         if not df.empty:
             # Create metrics
