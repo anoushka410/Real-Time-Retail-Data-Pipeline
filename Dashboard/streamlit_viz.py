@@ -6,10 +6,7 @@ import time
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from dotenv import load_dotenv
 from supabase import create_client
-
-load_dotenv()
 
 # Fetch Environment variables
 URL=os.getenv("supabase_url")
