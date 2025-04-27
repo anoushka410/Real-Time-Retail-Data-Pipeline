@@ -1,0 +1,9 @@
+kafka-python==2.1.5
+mysql-connector-python==9.2.0
+numpy==1.24.4
+pandas==1.5.3
+prometheus_client==0.14.1
+psycopg2==2.9.10
+psycopg2-binary==2.9.10
+pydantic==2.10.6
+# pyspark==3.5.5
