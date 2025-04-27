@@ -109,6 +109,7 @@ def fetch_data(time_duration):
             if response.data:
                 df = pd.DataFrame(response.data)
                 st.write(f"Displaying data for the last: {time_duration}")
+                st.dataframe(df)
                 return df
             else:
                 return pd.DataFrame()
@@ -156,7 +157,6 @@ def create_top_products_chart(df):
 
 # Function to create revenue trend chart
 def create_revenue_trend_chart(df):
-    st.dataframe(df)
     if not df.empty:
         df['hour'] = df['invoicedate'].dt.hour
         hourly_revenue = df.groupby('hour')['totalamount'].sum()
@@ -171,8 +171,7 @@ def create_revenue_trend_chart(df):
         
         chart_placeholder = st.empty()
         with chart_placeholder.container():\
-            st.dataframe(df)
-            # st.pyplot(fig)
+            st.pyplot(fig)
 
         plt.close(fig)
 
@@ -254,6 +253,7 @@ if __name__ == "__main__":
         df = fetch_data(selected_duration)
         # Convert InvoiceDate to datetime format
         df["invoicedate"] = pd.to_datetime(df["invoicedate"], format="%Y-%m-%d %H:%M:%S", errors='coerce')
+        st.dataframe(df)
         
         if not df.empty:
             # Create metrics
