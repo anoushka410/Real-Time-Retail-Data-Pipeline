@@ -8,12 +8,24 @@ from kafka import KafkaConsumer
 from kafka import KafkaProducer
 import pandas as pd
 import json
+import os
 from mysql.connector import Error
 import logging
 import psycopg2
 from psycopg2 import OperationalError
 from pydantic import BaseModel, ValidationError
 from prometheus_client import Counter, start_http_server
+from dotenv import load_dotenv
+
+
+# Fetch Environment variables
+load_dotenv()
+
+HOST = os.getenv("HOST")
+DBNAME = os.getenv("DBNAME")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+PORT= os.getenv("HPORTOST")
 
 
 # Define a Data Validation Schema in Pydantic
@@ -104,11 +116,11 @@ def create_database_connection():
         # )
 
         connection = psycopg2.connect(
-            database="real_time_db",
-            user="postgres",
-            password="postgresql",
-            host="localhost",
-            port="5432" 
+            database=DBNAME,
+            user=USERNAME,
+            password=PASSWORD,
+            host=HOST,
+            port=PORT
         )
         
         return connection

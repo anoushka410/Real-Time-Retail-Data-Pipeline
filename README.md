@@ -4,6 +4,8 @@ This project demonstrates a real-time data pipeline and analytics dashboard for 
 
 ---
 
+![alt text](Architecture_diagram.png)
+
 ## Approach Taken
 
 1. Simulated real-time ingestion of transactions using **Kafka Producer**.
@@ -28,34 +30,62 @@ This project demonstrates a real-time data pipeline and analytics dashboard for 
 ## 📁 Repository Structure
 
 ```
-├── kafka_producer/             # Kafka producer for simulated data feed
-├── kafka_consumer/             # Python consumer, validation, DB insert, metrics
-├── dashboard/                  # Streamlit dashboard app
-├── db/                         # SQL scripts for PostgreSQL setup (partitioning, indexing)
-├── monitoring/                 # Prometheus agent config and setup
-├── requirements.txt
-├── README.md
-└── architecture.png            # Pipeline architecture diagram
+├── Dashboard/                   # Streamlit dashboard app
+│   ├── requirements.txt         # Python dependencies for dashboard
+│   ├── streamlit_local.py       # Local Streamlit app
+│   └── streamlit_app.py         # Streamlit visualization scripts for Streamlit Cloud
+│
+├── Database/                    # SQL scripts and DB optimizations
+│   ├── all_queries.sql          # SQL setup (tables, indexes, partitions)
+│   └── optimization.md          # Database optimization notes
+│
+├── Pipeline/                    # Kafka producer-consumer and ingestion pipeline
+│   ├── Deprecated/              # Older or backup scripts (archived)
+│   ├── dlq_records.log          # Dead Letter Queue log file
+│   ├── kafka_consumer.py        # Kafka consumer with validation, DB inserts, metrics
+│   ├── kafka_producer.py        # Kafka producer to simulate streaming
+│   ├── online_retail_data.csv   # Sample dataset for simulation
+│   └── requirements.txt         # Python dependencies for pipeline
+│
+├── README.md                    # Project documentation
+└── architecture.png             # Pipeline architecture diagram
+
 ```
 
 ---
 
-## 🚀 Quick Start (Local)
+###  Setup Documentation: 
+https://cyan-braid-e26.notion.site/Real-Time-Retail-Data-Pipeline-1e34070bb67380e6aa31eac5cbe140ac
+
+---
+
+## 🚀 Quick Start - Ingestion Pipeline
 
 ```bash
+# Go to the Code directory
+cd Pipeline
+
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Start Kafka and Zookeeper (example)
-docker-compose up
-
 # Run Kafka Producer
-python kafka_producer/producer.py
+python kafka_producer.py
 
 # Run Kafka Consumer (with Prometheus metrics exposed)
-python kafka_consumer/consumer.py
+python kafka_consumer.py
 
-# Run Streamlit Dashboard
-streamlit run dashboard/app.py
 ```
+
+## 🚀 Quick Start - Streamlit App (Local)
+
+```bash
+# Go to the Code directory
+cd Dashboard
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run Streamlit app locally
+streamlit run streamlit_local.py
+
 ---

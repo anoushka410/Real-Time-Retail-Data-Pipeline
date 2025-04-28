@@ -6,11 +6,16 @@ import time
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from supabase import create_client
+from dotenv import load_dotenv
 
 # Fetch Environment variables
-URL=os.getenv("supabase_url")
-KEY=os.getenv("supabase_key")
+load_dotenv()
+
+HOST = os.getenv("HOST")
+DBNAME = os.getenv("DBNAME")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+PORT= os.getenv("HPORTOST")
 
 # Set the style for matplotlib
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -18,37 +23,27 @@ plt.style.use('seaborn-v0_8-whitegrid')
 # Set a consistent figure size for all charts
 CHART_SIZE = (12, 8)
 
-def get_connection_hosted_db():
+# Database connection function
+def get_db_connection():
     try:
-        # Initialize connection.
-        supabase_client = create_client(URL, KEY)
-        print("PostgreSQL connection to the hosted db established!")
-        return supabase_client
+        connection = psycopg2.connect(
+            database=DBNAME,
+            user=USERNAME,
+            password=PASSWORD,
+            host=HOST,
+            port=PORT
+        )
+        print("PostgreSQL connection established!")
+        return connection
     except Exception as e:
         st.error(f"Error connecting to database: {e}")
         return None
 
-# # Database connection function
-# def get_db_connection():
-#     try:
-#         connection = psycopg2.connect(
-#             database=DATABASE,
-#             user=USER,
-#             password=PASSWORD,
-#             host=HOST,
-#             port=PORT
-#         )
-#         print("PostgreSQL connection established!")
-#         return connection
-#     except Exception as e:
-#         st.error(f"Error connecting to database: {e}")
-#         return None
-
 # Function to fetch data from database
 def fetch_data(time_duration):
-    # connection = get_db_connection()
-    supabase_client = get_connection_hosted_db()
-    if supabase_client:
+    connection = get_db_connection()
+    # supabase_client = get_connection_hosted_db()
+    if connection:
         try:
             # Calculate the time filter based on selected duration
             # now = datetime.strptime("2010-12-01 12:00 PM", "%Y-%m-%d %I:%M %p")
@@ -72,52 +67,30 @@ def fetch_data(time_duration):
                 time_filter = now - timedelta(hours=24)  # Default to 24 hours
 
             print(time_filter)
-            # if time_filter == None:
-            #     query = f"""
-            #         SELECT 
-            #             description, quantity, invoicedate, country, totalamount
-            #         FROM online_retail 
-            #         """
-            # else:
-            #     query = f"""
-            #         SELECT 
-            #             description, quantity, invoicedate, country, totalamount
-            #         FROM online_retail 
-            #         WHERE 
-            #             invoicedate >= '{time_filter}' and invoicedate <= '{now}'
-            #         """
-            # df = pd.read_sql(query, connection)
-
             # Build the query
-            if time_filter is None:
-                response = (
-                    supabase_client
-                    .table("online_retail")
-                    .select("description, quantity, invoicedate, country, totalamount")
-                    .execute()
-                )
+            if time_filter == None:
+                query = f"""
+                    SELECT 
+                        description, quantity, invoicedate, country, totalamount
+                    FROM online_retail 
+                    """
             else:
-                response = (
-                    supabase_client
-                    .table("online_retail")
-                    .select("description, quantity, invoicedate, country, totalamount")
-                    .gte('invoicedate', time_filter.isoformat())
-                    .lte('invoicedate', now.isoformat())
-                    .execute()
-                )
-            
-            if response.data:
-                df = pd.DataFrame(response.data)
-                st.write(f"Displaying data for the last: {time_duration}")
-                return df
-            else:
-                return pd.DataFrame()
+                query = f"""
+                    SELECT 
+                        description, quantity, invoicedate, country, totalamount
+                    FROM online_retail 
+                    WHERE 
+                        invoicedate >= '{time_filter}' and invoicedate <= '{now}'
+                    """
+            df = pd.read_sql(query, connection)
+            st.write(f"Displaying data for the last: {time_duration}")
+            connection.close()
+            return df
             
         except Exception as e:
             st.error(f"Error fetching data: {e}")
             return pd.DataFrame()
-        
-        # connection.close()
+    
     else:
         return pd.DataFrame()
 
