@@ -33,7 +33,7 @@ This project demonstrates a real-time data pipeline and analytics dashboard for 
 ├── Dashboard/                   # Streamlit dashboard app
 │   ├── requirements.txt         # Python dependencies for dashboard
 │   ├── streamlit_local.py       # Local Streamlit app
-│   └── streamlit_app.py         # Streamlit visualization scripts for Streamlit Cloud
+│   └── streamlit_cloud_app.py   # Streamlit visualization scripts for Streamlit Cloud
 │
 ├── Database/                    # SQL scripts and DB optimizations
 │   ├── all_queries.sql          # SQL setup (tables, indexes, partitions)
