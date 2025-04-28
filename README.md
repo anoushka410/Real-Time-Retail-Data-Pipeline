@@ -21,7 +21,7 @@ This project demonstrates a real-time data pipeline and analytics dashboard for 
 
 - **Ingestion**: Apache Kafka Producer
 - **Processing**: Kafka Consumer (Python, psycopg2)
-- **Storage**: PostgreSQL s
+- **Storage**: PostgreSQL
 - **Visualization**: Streamlit (with Matplotlib and Seaborn)
 - **Monitoring**: Prometheus + Grafana Cloud
 
